@@ -1,0 +1,174 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <title>Ramadhan To-Do List</title>
+        <link href="styles.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+    </head>
+
+    <body>
+        <header class="page-header">
+            <a href="index.html"><img src="assets/logo.svg" alt="Ramadan Logo"></a>
+            <h1>Ramadhan To-Do List</h1>
+        </header>
+
+        <div class="page-wrapper">
+            <nav class="navbar">
+                <span class="nav-pill"></span>
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="shalat/index.html">Shalat Wajib</a></li>
+                    <li><a href="quran/index.html">Baca Qur'an</a></li>
+                    <li><a href="puasa/index.html">Puasa</a></li>
+                    <li><a href="dzikir/index.html">Dzikir</a></li>
+                </ul>
+            </nav>
+
+            <div class="daily-summary">
+                <h2>Ringkasan Progress Harian</h2>
+                <div class="summary-cards">
+                    <a href="shalat/index.html" class="sum-card">
+                        <div class="sum-card-label">Shalat Wajib</div>
+                        <div class="sum-card-pct" id="sum-shalat">0%</div>
+                        <div class="progress-bar-wrap"><div class="progress-bar" id="bar-shalat"></div></div>
+                    </a>
+                    <a href="quran/index.html" class="sum-card">
+                        <div class="sum-card-label">Baca Qur'an</div>
+                        <div class="sum-card-pct" id="sum-quran">0%</div>
+                        <div class="progress-bar-wrap"><div class="progress-bar" id="bar-quran"></div></div>
+                    </a>
+                    <a href="puasa/index.html" class="sum-card">
+                        <div class="sum-card-label">Puasa</div>
+                        <div class="sum-card-pct" id="sum-puasa">0%</div>
+                        <div class="progress-bar-wrap"><div class="progress-bar" id="bar-puasa"></div></div>
+                    </a>
+                    <a href="dzikir/index.html" class="sum-card">
+                        <div class="sum-card-label">Dzikir</div>
+                        <div class="sum-card-pct" id="sum-dzikir">0%</div>
+                        <div class="progress-bar-wrap"><div class="progress-bar" id="bar-dzikir"></div></div>
+                    </a>
+                </div>
+                <div class="motivation-box" id="motivation-text">Bismillah! Mari mulai hari ini dengan penuh semangat.</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-card-title">Status Motivasi Hari Ini</div>
+                <div style="text-align:center;padding:8px 0;">
+                    <div style="font-size:0.97rem;color:#555;line-height:1.8;">
+                        <strong style="color:#1a6b42;">Ramadhan 1447 H</strong><br>
+                        Pantau ibadah harianmu. Klik salah satu kategori di atas untuk memulai!
+                    </div>
+                    <div class="progress-info" style="margin-top:22px;margin-bottom:8px;">
+                        <span class="progress-label">Progress Keseluruhan Hari Ini</span>
+                        <span class="progress-pct" id="overall-pct">0%</span>
+                    </div>
+                    <div class="progress-bar-wrap" style="height:14px;">
+                        <div class="progress-bar" id="overall-bar"></div>
+                    </div>
+                    <div class="status-text status-low" id="overall-status" style="margin-top:16px;">Belum ada data hari ini</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Dalam rangka memperingati bulan Ramadan 1447 H</p>
+        </footer>
+
+        <script>
+            function loadProgress() {
+                const today = new Date().toISOString().split('T')[0];
+
+                const shalatData = JSON.parse(localStorage.getItem('shalat_' + today) || '[]');
+                const shalatPct = shalatData.length ? Math.round((shalatData.filter(Boolean).length / 5) * 100) : 0;
+
+                const quranData = JSON.parse(localStorage.getItem('quran_' + today) || 'null');
+                let quranPct = 0;
+                if (quranData) {
+                    if (quranData.done) quranPct = 100;
+                    else if (quranData.target > 0) quranPct = Math.min(100, Math.round((quranData.dibaca / quranData.target) * 100));
+                }
+
+                const puasaDays = JSON.parse(localStorage.getItem('puasa_days') || '[]');
+                const puasaPct = Math.round((puasaDays.length / 30) * 100);
+
+                const dzikirData = JSON.parse(localStorage.getItem('dzikir_' + today) || '{}');
+                const dzikirTotal = (dzikirData.subhanallah || 0) + (dzikirData.alhamdulillah || 0) + (dzikirData.allahuakbar || 0);
+                const dzikirPct = Math.min(100, Math.round((dzikirTotal / 99) * 100));
+
+                document.getElementById('sum-shalat').textContent = shalatPct + '%';
+                document.getElementById('bar-shalat').style.width = shalatPct + '%';
+                document.getElementById('sum-quran').textContent = quranPct + '%';
+                document.getElementById('bar-quran').style.width = quranPct + '%';
+                document.getElementById('sum-puasa').textContent = puasaPct + '%';
+                document.getElementById('bar-puasa').style.width = puasaPct + '%';
+                document.getElementById('sum-dzikir').textContent = dzikirPct + '%';
+                document.getElementById('bar-dzikir').style.width = dzikirPct + '%';
+
+                const overall = Math.round((shalatPct + quranPct + puasaPct + dzikirPct) / 4);
+                document.getElementById('overall-pct').textContent = overall + '%';
+                document.getElementById('overall-bar').style.width = overall + '%';
+
+                const statusEl = document.getElementById('overall-status');
+                const motivEl  = document.getElementById('motivation-text');
+                if (overall === 0) {
+                    statusEl.textContent = 'Belum ada data hari ini.';
+                    statusEl.className = 'status-text status-low';
+                    motivEl.textContent = 'Bismillah! Mari mulai hari ini dengan penuh semangat.';
+                } else if (overall < 40) {
+                    statusEl.textContent = 'Belum optimal - semangat terus ya!';
+                    statusEl.className = 'status-text status-low';
+                    motivEl.textContent = 'Jangan menyerah, setiap amal kebaikan dicatat Allah.';
+                } else if (overall < 80) {
+                    statusEl.textContent = 'Cukup baik - pertahankan!';
+                    statusEl.className = 'status-text status-mid';
+                    motivEl.textContent = 'Makin hari makin baik!';
+                } else if (overall < 100) {
+                    statusEl.textContent = 'Luar biasa - hampir sempurna!';
+                    statusEl.className = 'status-text status-high';
+                    motivEl.textContent = 'Tinggal selangkah lagi menuju hari yang sempurna!';
+                } else {
+                    statusEl.textContent = 'MasyaAllah! Hari yang sempurna!';
+                    statusEl.className = 'status-text status-done';
+                    motivEl.textContent = 'MasyaAllah Tabarakallah! Semoga diterima Allah SWT.';
+                }
+            }
+
+            loadProgress();
+
+            (function() {
+                var nav = document.querySelector('.navbar');
+                var pill = document.querySelector('.nav-pill');
+                var active = document.querySelector('.navbar a.active');
+                function movePill(el, animate) {
+                    if (!pill || !nav || !el) return;
+                    var nr = nav.getBoundingClientRect();
+                    var er = el.getBoundingClientRect();
+                    if (!animate) pill.style.transition = 'none';
+                    pill.style.left   = (er.left - nr.left) + 'px';
+                    pill.style.top    = (er.top  - nr.top)  + 'px';
+                    pill.style.width  = er.width  + 'px';
+                    pill.style.height = er.height + 'px';
+                    pill.classList.add('visible');
+                    if (!animate) requestAnimationFrame(function() { requestAnimationFrame(function() { pill.style.transition = ''; }); });
+                }
+                if (active) movePill(active, false);
+                document.querySelectorAll('.navbar a').forEach(function(link) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        var href = this.getAttribute('href');
+                        var cur = document.querySelector('.navbar a.active');
+                        if (cur) {
+                            cur.classList.remove('active');
+                            this.classList.add('active');
+                            movePill(this, true);
+                            setTimeout(function() { window.location.href = href; }, 490);
+                        } else {
+                            window.location.href = href;
+                        }
+                    });
+                });
+            })();
+        </script>
+    </body>
+</html>
