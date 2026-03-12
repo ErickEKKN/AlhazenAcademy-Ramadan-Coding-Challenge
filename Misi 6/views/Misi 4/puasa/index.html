@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <title>Puasa - Ramadhan To-Do List</title>
+        <link href="../styles.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+    </head>
+
+    <body>
+        <header class="page-header">
+            <img src="../assets/logo.svg" alt="Ramadan Logo">
+            <h1>Puasa Ramadhan</h1>
+        </header>
+
+        <div class="page-wrapper">
+            <nav class="navbar">
+                <span class="nav-pill"></span>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../shalat/index.html">Shalat Wajib</a></li>
+                    <li><a href="../quran/index.html">Baca Qur'an</a></li>
+                    <li><a href="index.html" class="active">Puasa</a></li>
+                    <li><a href="../dzikir/index.html">Dzikir</a></li>
+                </ul>
+            </nav>
+
+            <div class="daily-summary">
+                <h2>Ringkasan Progress Harian</h2>
+                <div class="progress-info">
+                    <span class="progress-label" style="color:#e8d89a;">Puasa Ramadhan 1447 H</span>
+                    <span class="progress-pct" style="color:#f0d080;" id="puasa-count">0 / 30 hari</span>
+                </div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar" id="puasa-bar"></div>
+                </div>
+                <div class="motivation-box" id="puasa-status">
+                    Tandai hari puasa yang telah kamu jalani.
+                </div>
+            </div>
+
+            <div class="feature-card" style="margin-bottom:20px;">
+                <div class="ramadhan-day-indicator" id="day-indicator">
+                    <div class="day-num" id="today-day">🌙</div>
+                    <div class="day-label" id="today-day-label">Memuat data...</div>
+                </div>
+                <div class="today-check" id="today-check-wrap">
+                    <input type="checkbox" id="today-puasa">
+                    <label for="today-puasa">Sudah puasa hari ini</label>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-card-title">Kalender Ramadhan 1447 H</div>
+
+                <div class="puasa-calendar-grid" id="puasa-calendar"></div>
+
+                <div class="progress-info" style="margin-bottom:8px;">
+                    <span class="progress-label">Progress 30 Hari</span>
+                    <span class="progress-pct" id="puasa-pct-bar">0%</span>
+                </div>
+                <div class="progress-bar-wrap" style="height:14px;margin-bottom:20px;">
+                    <div class="progress-bar" id="puasa-progress-bar"></div>
+                </div>
+
+                <button class="save-btn" onclick="savePuasa()">Simpan</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Dalam rangka memperingati bulan Ramadan 1447 H</p>
+        </footer>
+
+        <script>
+            const RAMADHAN_START = new Date('2026-02-18T00:00:00');
+            const STORAGE_KEY = 'puasa_days';
+
+            function todayLocal() {
+                const d = new Date();
+                d.setHours(0, 0, 0, 0);
+                return d;
+            }
+
+            function getRamadhanDay(date) {
+                const d = new Date(date);
+                d.setHours(0, 0, 0, 0);
+                return Math.floor((d - RAMADHAN_START) / 86400000) + 1;
+            }
+
+            function loadDays() {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            }
+
+            function saveDays(days) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(days));
+            }
+
+            function buildCalendar() {
+                const days = loadDays();
+                const todayDay = getRamadhanDay(todayLocal());
+                const grid = document.getElementById('puasa-calendar');
+                grid.innerHTML = '';
+
+                for (let i = 1; i <= 30; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cal-day';
+                    const isDone   = days.includes(i);
+                    const isToday  = i === todayDay;
+                    const isFuture = i > todayDay;
+
+                    if (isDone) {
+                        cell.classList.add('done');
+                        cell.innerHTML = '<span style="font-size:1rem;">✓</span><small style="position:absolute;top:3px;left:0;right:0;text-align:center;font-size:0.6rem;opacity:0.7;">' + i + '</small>';
+                    } else {
+                        cell.textContent = i;
+                        if (isToday)  cell.classList.add('today');
+                        if (isFuture) cell.classList.add('future');
+                    }
+
+                    if (!isFuture) {
+                        cell.style.cursor = 'pointer';
+                        cell.title = 'Hari ke-' + i;
+                        cell.addEventListener('click', () => toggleDay(i));
+                    }
+
+                    grid.appendChild(cell);
+                }
+            }
+
+            function toggleDay(day) {
+                const days = loadDays();
+                const idx = days.indexOf(day);
+                if (idx === -1) days.push(day);
+                else days.splice(idx, 1);
+                days.sort((a, b) => a - b);
+                saveDays(days);
+
+
+                const todayDay = getRamadhanDay(todayLocal());
+                if (day === todayDay) {
+                    document.getElementById('today-puasa').checked = days.includes(day);
+                }
+
+                updateUI();
+                buildCalendar();
+            }
+
+            function updateUI() {
+                const days = loadDays();
+                const count = days.length;
+                const pct = Math.round((count / 30) * 100);
+                const todayDay = getRamadhanDay(todayLocal());
+
+                document.getElementById('puasa-count').textContent = count + ' / 30 hari';
+                document.getElementById('puasa-bar').style.width = pct + '%';
+                document.getElementById('puasa-pct-bar').textContent = pct + '%';
+                document.getElementById('puasa-progress-bar').style.width = pct + '%';
+
+                if (todayDay >= 1 && todayDay <= 30) {
+                    document.getElementById('today-day').textContent = 'Hari ke-' + todayDay;
+                    document.getElementById('today-day-label').textContent = 'Ramadhan 1447 H';
+                    document.getElementById('today-check-wrap').style.display = 'flex';
+                    document.getElementById('today-puasa').checked = days.includes(todayDay);
+                } else if (todayDay > 30) {
+                    document.getElementById('today-day').textContent = 'Selesai';
+                    document.getElementById('today-day-label').textContent = 'Ramadhan 1447 H telah selesai';
+                    document.getElementById('today-check-wrap').style.display = 'none';
+                } else {
+                    document.getElementById('today-day').textContent = 'Menunggu';
+                    document.getElementById('today-day-label').textContent = 'Ramadhan 1447 H belum dimulai';
+                    document.getElementById('today-check-wrap').style.display = 'none';
+                }
+
+                const statusEl = document.getElementById('puasa-status');
+                if (count === 0) {
+                    statusEl.textContent = 'Belum ada hari puasa yang tercatat.';
+                } else if (count < 15) {
+                    statusEl.textContent = count + ' hari puasa - semangat terus!';
+                } else if (count < 30) {
+                    statusEl.textContent = count + ' hari puasa - hampir selesai!';
+                } else {
+                    statusEl.textContent = 'MasyaAllah! 30 hari puasa lengkap!';
+                }
+            }
+
+            function savePuasa() {
+                const todayDay = getRamadhanDay(todayLocal());
+                if (todayDay >= 1 && todayDay <= 30) {
+                    const checked = document.getElementById('today-puasa').checked;
+                    const days = loadDays();
+                    const idx = days.indexOf(todayDay);
+                    if (checked && idx === -1) { days.push(todayDay); days.sort((a, b) => a - b); }
+                    else if (!checked && idx !== -1) { days.splice(idx, 1); }
+                    saveDays(days);
+                }
+                showToast('Data puasa tersimpan.');
+                updateUI();
+                buildCalendar();
+            }
+
+            function showToast(msg) {
+                let c = document.querySelector('.toast-container');
+                if (!c) { c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); }
+                const t = document.createElement('div');
+                t.className = 'toast';
+                t.textContent = msg;
+                c.appendChild(t);
+                setTimeout(() => t.remove(), 3000);
+            }
+
+            updateUI();
+            buildCalendar();
+
+            (function() {
+                var nav = document.querySelector('.navbar');
+                var pill = document.querySelector('.nav-pill');
+                var active = document.querySelector('.navbar a.active');
+                function movePill(el, animate) {
+                    if (!pill || !nav || !el) return;
+                    var nr = nav.getBoundingClientRect();
+                    var er = el.getBoundingClientRect();
+                    if (!animate) pill.style.transition = 'none';
+                    pill.style.left   = (er.left - nr.left) + 'px';
+                    pill.style.top    = (er.top  - nr.top)  + 'px';
+                    pill.style.width  = er.width  + 'px';
+                    pill.style.height = er.height + 'px';
+                    pill.classList.add('visible');
+                    if (!animate) requestAnimationFrame(function() { requestAnimationFrame(function() { pill.style.transition = ''; }); });
+                }
+                if (active) movePill(active, false);
+                document.querySelectorAll('.navbar a').forEach(function(link) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        var href = this.getAttribute('href');
+                        var cur = document.querySelector('.navbar a.active');
+                        if (cur) {
+                            cur.classList.remove('active');
+                            this.classList.add('active');
+                            movePill(this, true);
+                            setTimeout(function() { window.location.href = href; }, 490);
+                        } else {
+                            window.location.href = href;
+                        }
+                    });
+                });
+            })();
+        </script>
+    </body>
+</html>

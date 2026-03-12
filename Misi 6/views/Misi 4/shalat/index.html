@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <title>Shalat Wajib - Ramadhan To-Do List</title>
+        <link href="../styles.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+    </head>
+
+    <body>
+        <header class="page-header">
+            <a href="../index.html"><img src="../assets/logo.svg" alt="Ramadan Logo"></a>
+            <h1>Shalat Wajib</h1>
+        </header>
+
+        <div class="page-wrapper">
+            <nav class="navbar">
+                <span class="nav-pill"></span>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="index.html" class="active">Shalat Wajib</a></li>
+                    <li><a href="../quran/index.html">Baca Qur'an</a></li>
+                    <li><a href="../puasa/index.html">Puasa</a></li>
+                    <li><a href="../dzikir/index.html">Dzikir</a></li>
+                </ul>
+            </nav>
+
+            <div class="daily-summary">
+                <h2>Ringkasan Progress Harian</h2>
+                <div class="progress-info">
+                    <span class="progress-label" style="color:#e8d89a;">Shalat Wajib Hari Ini</span>
+                    <span class="progress-pct" style="color:#f0d080;" id="shalat-pct">0%</span>
+                </div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar" id="shalat-bar"></div>
+                </div>
+                <div class="motivation-box" id="shalat-status">
+                    Tandai shalat yang telah kamu laksanakan hari ini.
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-card-title">Checklist Shalat Wajib</div>
+
+                <div class="shalat-list" id="shalat-list">
+                    <label class="shalat-item">
+                        <input type="checkbox" class="shalat-cb">
+                        <span class="shalat-custom-check">✓</span>
+                        <span class="shalat-name">Subuh</span>
+                        <span class="shalat-time">2 rakaat</span>
+                    </label>
+                    <label class="shalat-item">
+                        <input type="checkbox" class="shalat-cb">
+                        <span class="shalat-custom-check">✓</span>
+                        <span class="shalat-name">Dzuhur</span>
+                        <span class="shalat-time">4 rakaat</span>
+                    </label>
+                    <label class="shalat-item">
+                        <input type="checkbox" class="shalat-cb">
+                        <span class="shalat-custom-check">✓</span>
+                        <span class="shalat-name">Ashar</span>
+                        <span class="shalat-time">4 rakaat</span>
+                    </label>
+                    <label class="shalat-item">
+                        <input type="checkbox" class="shalat-cb">
+                        <span class="shalat-custom-check">✓</span>
+                        <span class="shalat-name">Maghrib</span>
+                        <span class="shalat-time">3 rakaat</span>
+                    </label>
+                    <label class="shalat-item">
+                        <input type="checkbox" class="shalat-cb">
+                        <span class="shalat-custom-check">✓</span>
+                        <span class="shalat-name">Isya</span>
+                        <span class="shalat-time">4 rakaat</span>
+                    </label>
+                </div>
+
+                <button class="save-btn" onclick="saveShalat()">Simpan</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Dalam rangka memperingati bulan Ramadan 1447 H</p>
+        </footer>
+
+        <script>
+            const TODAY_KEY = 'shalat_' + new Date().toISOString().split('T')[0];
+
+            function updateProgress() {
+                const checkboxes = document.querySelectorAll('.shalat-cb');
+                const count = Array.from(checkboxes).filter(cb => cb.checked).length;
+                const pct = Math.round((count / 5) * 100);
+
+                document.getElementById('shalat-pct').textContent = pct + '%';
+                document.getElementById('shalat-bar').style.width = pct + '%';
+
+                const statusEl = document.getElementById('shalat-status');
+                if (pct === 0) {
+                    statusEl.textContent = 'Belum ada shalat yang ditandai hari ini.';
+                    statusEl.style.borderLeftColor = '#c9a84c';
+                    statusEl.style.background = '';
+                } else if (pct <= 40) {
+                    statusEl.textContent = 'Belum optimal - semangat terus!';
+                    statusEl.style.borderLeftColor = '#ffc107';
+                    statusEl.style.background = 'rgba(255,193,7,0.08)';
+                } else if (pct < 100) {
+                    statusEl.textContent = 'Cukup baik - lanjutkan ibadahmu!';
+                    statusEl.style.borderLeftColor = '#17a2b8';
+                    statusEl.style.background = 'rgba(23,162,184,0.08)';
+                } else {
+                    statusEl.textContent = 'MasyaAllah lengkap! Alhamdulillah.';
+                    statusEl.style.borderLeftColor = '#28a745';
+                    statusEl.style.background = 'rgba(40,167,69,0.1)';
+                }
+            }
+
+            function loadShalat() {
+                const saved = JSON.parse(localStorage.getItem(TODAY_KEY) || '[]');
+                const items = document.querySelectorAll('#shalat-list .shalat-item');
+                document.querySelectorAll('.shalat-cb').forEach((cb, i) => {
+                    cb.checked = !!saved[i];
+                    items[i].classList.toggle('checked', !!saved[i]);
+                });
+                updateProgress();
+            }
+
+            function saveShalat() {
+                const data = Array.from(document.querySelectorAll('.shalat-cb')).map(cb => cb.checked);
+                localStorage.setItem(TODAY_KEY, JSON.stringify(data));
+                showToast('Progress shalat tersimpan.');
+            }
+
+            function showToast(msg) {
+                let c = document.querySelector('.toast-container');
+                if (!c) { c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); }
+                const t = document.createElement('div');
+                t.className = 'toast';
+                t.textContent = msg;
+                c.appendChild(t);
+                setTimeout(() => t.remove(), 3000);
+            }
+
+            document.querySelectorAll('.shalat-cb').forEach(cb => {
+                cb.addEventListener('change', function () {
+                    this.closest('.shalat-item').classList.toggle('checked', this.checked);
+                    updateProgress();
+                });
+            });
+
+            loadShalat();
+
+            (function() {
+                var nav = document.querySelector('.navbar');
+                var pill = document.querySelector('.nav-pill');
+                var active = document.querySelector('.navbar a.active');
+                function movePill(el, animate) {
+                    if (!pill || !nav || !el) return;
+                    var nr = nav.getBoundingClientRect();
+                    var er = el.getBoundingClientRect();
+                    if (!animate) pill.style.transition = 'none';
+                    pill.style.left   = (er.left - nr.left) + 'px';
+                    pill.style.top    = (er.top  - nr.top)  + 'px';
+                    pill.style.width  = er.width  + 'px';
+                    pill.style.height = er.height + 'px';
+                    pill.classList.add('visible');
+                    if (!animate) requestAnimationFrame(function() { requestAnimationFrame(function() { pill.style.transition = ''; }); });
+                }
+                if (active) movePill(active, false);
+                document.querySelectorAll('.navbar a').forEach(function(link) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        var href = this.getAttribute('href');
+                        var cur = document.querySelector('.navbar a.active');
+                        if (cur) {
+                            cur.classList.remove('active');
+                            this.classList.add('active');
+                            movePill(this, true);
+                            setTimeout(function() { window.location.href = href; }, 490);
+                        } else {
+                            window.location.href = href;
+                        }
+                    });
+                });
+            })();
+        </script>
+    </body>
+</html>
