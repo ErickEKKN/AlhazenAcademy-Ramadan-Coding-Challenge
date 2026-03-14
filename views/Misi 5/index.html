@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <title>Jadwal Imsakiyah</title>
+        <link href="styles.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+    </head>
+
+    <body>
+        <header class="imsak-header">
+            <h1>Jadwal Imsakiyah Ramadhan 1447 H</h1>
+            <p class="header-sub">Data prakiraan waktu sholat berdasarkan kota pilihan</p>
+        </header>
+        <main class="imsak-main">
+            <section class="imsak-controls">
+                <div class="city-select-wrap">
+                    <label for="city-select" class="imsak-select-label">Pilih Kota</label>
+                    <div class="select-wrapper">
+                        <select id="city-select" class="zakat-select">
+                            <option value="">Memuat daftar kota...</option>
+                        </select>
+                    </div>
+                </div>
+                <p class="month-badge" id="month-badge"></p>
+            </section>
+            <div id="imsak-status" class="imsak-status hidden"></div>
+            <section class="imsak-table-section">
+                <div class="table-scroll-wrap">
+                    <table class="imsak-table" id="imsak-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Imsak</th>
+                                <th>Subuh</th>
+                                <th>Dzuhur</th>
+                                <th>Ashar</th>
+                                <th>Maghrib</th>
+                                <th>Isya</th>
+                            </tr>
+                        </thead>
+                        <tbody id="imsak-tbody">
+                            <tr class="imsak-placeholder-row">
+                                <td colspan="7">Silakan pilih kota untuk melihat jadwal imsakiyah.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>Dalam rangka memperingati bulan Ramadan 1447 H</p>
+        </footer>
+        <script src="main.js"></script>
+    </body>
+</html>

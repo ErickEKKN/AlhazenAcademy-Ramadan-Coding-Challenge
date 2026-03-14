@@ -1,0 +1,61 @@
+﻿<html>
+    <head>
+        <title>Counter Dzikir</title>
+        <link href="styles.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    
+    <body>
+        <div class="toast-container" id="toast-container"></div>
+
+        <button class="notif-btn" id="notif-btn" aria-label="Notifikasi">
+            🔔
+            <span class="notif-count" id="notif-count">0</span>
+        </button>
+
+        <div class="notif-panel" id="notif-panel" aria-live="polite">
+            <div class="notif-panel-header">
+                <span>Notifikasi</span>
+                <button class="notif-close" id="notif-close" aria-label="Tutup">&times;</button>
+            </div>
+            <div class="notif-body" id="notification"></div>
+            <div class="notif-empty" id="notif-empty">Belum ada notifikasi</div>
+        </div>
+        <div class="notif-overlay" id="notif-overlay"></div>
+
+        <main class="container">
+            <section class="dzikir-section">
+                <h1>Counter Dzikir</h1>
+
+                <div class="counter-card">
+                    <div class="counter-label">Jumlah Dzikir</div>
+                    <div class="counter-display" id="count">0</div>
+                    <div class="progress-bar-wrap">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <div class="target-info">Target: <span id="target">100</span></div>
+                </div>
+
+                <div class="btn-group">
+                    <button id="increment" class="btn btn-tambah">+ Tambah</button>
+                    <button id="reset" class="btn btn-reset">↺ Reset</button>
+                </div>
+
+                <div class="target-select-wrap">
+                    <label>Pilih Target:</label>
+                    <div class="target-options">
+                        <button class="target-opt" data-val="33">33x</button>
+                        <button class="target-opt" data-val="99">99x</button>
+                        <button class="target-opt active" data-val="100">100x</button>
+                        <button class="target-opt" data-val="200">200x</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Dalam rangka memperingati bulan Ramadan 1447 H</p>
+        </footer>
+        <script src="main.js"></script>
+    </body>
+</html>
